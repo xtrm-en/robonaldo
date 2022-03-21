@@ -8,6 +8,9 @@ class Updatable:
     def update(self) -> None:
         self.last_update = int(time.time() * 1000)
 
+    def get_delta(self) -> int:
+        return time.time() * 1000 - self.last_update
+
 
 class Positionable(Updatable):
     def __init__(self, position: (int, int) = (0, 0), last_update: int = -1):
