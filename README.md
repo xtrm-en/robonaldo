@@ -1,3 +1,3 @@
 # robonaldo
 
-(c) Ratio, Inc. 2022
+Copyright (c) 2022 xtrm
