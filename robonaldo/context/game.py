@@ -1,8 +1,10 @@
-from entities import Positionable, Robot
+from typing import List
+from .entities import Positionable
+from .robot import Robot
 
 class Terrain(Positionable):
     def __init__(self, x, y, width, height):
-        super().__init__(x, y, 0)
+        super().__init__(x, y, -1)
         self.__width = width
         self.__height = height
 

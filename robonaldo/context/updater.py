@@ -3,25 +3,42 @@ try:
 except:
     import rsk
 
+from robonaldo.log import Logger, LogLevel
+from robonaldo.network import NetworkHandler
+from robonaldo.context.game import GameContext, Terrain, Ball
+
 class ContextUpdater():
-    def __init__(self, host: str, key: str = ""):
-        self.__host = host
-        self.__key = key
+    def __init__(self, net_handler: NetworkHandler):
+        self.__logger = Logger(name = "ContextUpdater", priority = LogLevel.DEBUG)
 
-        self.__client = rsk.Client(host = host, key = key)
-        self.__client.on_update = lambda cl, dt: self.dispatch_context(cl, dt)
-
+        self.__nethandler = net_handler
         self.__ctx = None
         
         self.__audience = []
+
+
+    def initialize(self) -> None:
+        self.__logger.info("Setting context hook...")
+        self.__nethandler.set_hook(lambda cl, dt: self.dispatch_context(cl, dt))
         
 
+    def register(self, listener) -> None:
+        self.__audience.append(listener)
+
+    
+    def unregister(self, listener) -> None:
+        self.__audience.remove(listener)
+
+
     def dispatch_context(self, client: rsk.Client, deltaTime: float):
+        self.__logger.debug("Dispatching context")
         self.update_context(client, deltaTime)
 
         for listener in self.__audience:
             listener(self.__ctx, deltaTime)
+
         
     def update_context(self, client: rsk.Client, deltaTime: float):
-        pass
+        if self.__ctx is None:
+            self.__ctx = GameContext()
 

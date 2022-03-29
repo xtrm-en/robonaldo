@@ -1,4 +1,4 @@
 robot-soccer-kit
 mido
-aenum
 python-rtmidi
+aenum
