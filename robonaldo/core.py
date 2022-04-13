@@ -10,6 +10,7 @@ from robonaldo.utils import Singleton
 
 class Robonaldo(metaclass = Singleton):
     __constructed = False
+    __connected = False
     __initialized = False
 
     def construct(self) -> None:
@@ -30,7 +31,18 @@ class Robonaldo(metaclass = Singleton):
         self.__logger.info("Setting up StrategyManager...")
         StrategyManager().register_all()
  
-    def initialize(self, team_color: RobotColor, host: str, key: str) -> None:
+    def connect(self, host: str, key: str) -> None:
+        self.__logger.info("Initializing connection to the server...")
+        self.network_handler.connect(host = host, key = key, wait = True)
+        self.__logger.info("Connection established.")
+
+        self.__connected = True
+
+    def initialize(self, team_color: RobotColor) -> None:
+        if self.__connected is not True:
+            self.__logger.error("Robonaldo client not connected to a server!")
+            return
+
         if self.__initialized is True:
             return
         self.__initialized = True
@@ -42,14 +54,13 @@ class Robonaldo(metaclass = Singleton):
             team_color.get_other(): RobotOwnership.ENEMY
         }
 
-        self.__logger.info("Initializing NetworkHandler...")
-        self.network_handler.connect(host = host, key = key, wait = False)
-
         self.__logger.info("Initializing ContextUpdater...")
         self.context_updater.initialize()
         
         self.__logger.info("Registering StrategyManager to ContextUpdater...")
         StrategyManager().register_on(self.context_updater)
+
+        self.__logger.info("Let's rock.")
 
     def stop(self) -> None:
         self.__logger.info("Stopping...")
