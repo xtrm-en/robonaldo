@@ -14,10 +14,21 @@ class Strategy(Command):
             return (False, "Invalid command argument")
         if len(ctx.args) == 2:
             if ctx.args[0] == "toggle":
-                strat_id = 
-                pass
+                strat_id = ctx.args[1].lower()
+                if strat_id == "all":
+                    for strat in StrategyManager().strategies.values():
+                        StrategyManager().set_enabled(strat, not StrategyManager().is_enabled(strat))
+                    return (True, "")
+                strat = StrategyManager().by_name(strat_id)
+                if strat is not None:
+                    StrategyManager().set_enabled(strat, not StrategyManager().is_enabled(strat))
+                    return (True, "")
+            
+                return (False, "Unknown strategy '" + strat_id + "'")
+
             if ctx.args[0] == "enable":
                 pass
+
             if ctx.args[0] == "disable":
                 pass
 

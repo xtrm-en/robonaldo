@@ -45,6 +45,9 @@ class StrategyManager(metaclass = Singleton):
                 name = file.replace('.py', '')
                 __import__(name)
 
+    def by_name(self, name: str) -> RobotStrategy:
+        return self.strategies.get(name)
+
     def is_enabled(self, strategy: RobotStrategy) -> bool:
         return strategy in self.enabled
 
@@ -52,15 +55,17 @@ class StrategyManager(metaclass = Singleton):
         if state:
             if strategy not in self.enabled:
                 self.enabled.append(strategy)
+            self.__logger.info("Enabled strategy \'" + strategy.id + "\'.")
         else:
             if strategy in self.enabled:
                 self.enabled.remove(strategy)
+            self.__logger.info("Disabled strategy \'" + strategy.id + "\'.")
 
 
-    def register(self, strat: RobotStrategy, state: bool) -> None:
-        self.__logger.trace("Registering strategy \'" + strat.id + "\'.")
-        self.strategies[strat.id] = strat
-        self.set_enabled(strat, state)
+    def register(self, strategy: RobotStrategy, state: bool) -> None:
+        self.__logger.trace("Registering strategy \'" + strategy.id + "\'.")
+        self.strategies[strategy.id] = strategy
+        self.set_enabled(strategy, state)
 
     def register_on(self, updater: ContextUpdater) -> None:
         if self.__reg is not True:
