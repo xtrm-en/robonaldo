@@ -36,6 +36,7 @@ class StrategyManager(metaclass = Singleton):
     __target = 'robonaldo/strategies'
     __logger = Logger("StrategyManager", priority = LogLevel.TRACE)
     strategies = {}
+    enabled = []
 
     def register_all(self) -> None:
         sys.path.append(self.__target)
@@ -44,9 +45,22 @@ class StrategyManager(metaclass = Singleton):
                 name = file.replace('.py', '')
                 __import__(name)
 
+    def is_enabled(self, strategy: RobotStrategy) -> bool:
+        return strategy in self.enabled
+
+    def set_enabled(self, strategy: RobotStrategy, state: bool) -> None:
+        if state:
+            if strategy not in self.enabled:
+                self.enabled.append(strategy)
+        else:
+            if strategy in self.enabled:
+                self.enabled.remove(strategy)
+
+
     def register(self, strat: RobotStrategy, state: bool) -> None:
         self.__logger.trace("Registering strategy \'" + strat.id + "\'.")
-        self.strategies[strat.id] = (strat, state)
+        self.strategies[strat.id] = strat
+        self.set_enabled(strat, state)
 
     def register_on(self, updater: ContextUpdater) -> None:
         if self.__reg is not True:
