@@ -13,12 +13,20 @@ class Updatable:
 
 
 class Positionable(Updatable):
-    def __init__(self, position: (int, int) = (0, 0), last_update: int = -1):
+    def __init__(self, position: (float, float) = (0, 0), last_update: int = -1):
         super().__init__(last_update)
+        self.position = position
+
+    def update(self, position: (float, float)) -> None:
+        super().update()
         self.position = position
 
 
 class Rotatable(Positionable):
-    def __init__(self, position: (int, int), rotation: float):
+    def __init__(self, position: (float, float), rotation: float):
         super().__init__(position)
+        self.rotation = rotation
+    
+    def update(self, position: (float, float), rotation: float) -> None:
+        super().update(position)
         self.rotation = rotation

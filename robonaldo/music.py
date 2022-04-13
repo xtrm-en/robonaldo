@@ -2,9 +2,10 @@
 Robonaldo Musicinator(tm)(copyrighted) UwU
 """
 
-import mido
-# import robonaldo.context.robot.Robot
-# import robonaldo.controller.GameController
+from mido import MidiFile
+from mido.messages import Message
+from robonaldo.controller import GameController, RobotController
+from typing import overload
 
 midiMap = {
     0: 8.176,
@@ -129,7 +130,7 @@ midiMap = {
 
 class MIDITranslator:
     @staticmethod
-    def translate(message: mido.messages.Message) -> (float, float, bool):
+    def translate(message: Message) -> (float, float, bool):
         internal_vars = vars(message)
         if 'note_on' not in internal_vars['type']:
             return (-1, -1, False)
@@ -140,27 +141,33 @@ class MIDITranslator:
         return (freq, duration, True)
 
 
-# class WavelengthPlayer:
-#     @staticmethod
-#     def play(midi: mido.MidiFile):
-#         for message in midi.play():
-#             target = GameController.random_robot()
-#             freq, duration, valid = MIDITranslator.translate(message)
-#             if valid:
-#                 playNote(freq, duration, target)
+class Player:
+    @staticmethod
+    def play_random(midi: MidiFile):
+        for message in midi.play():
+            controller = GameController().random(owned = True)
+            freq, duration, valid = MIDITranslator.translate(message)
+            if valid:
+                Player.play_note(freq, duration, controller)
 
-#     @staticmethod
-#     def play(midi: mido.MidiFile, target: Robot):
-#         for message in midi.play():
-#             freq, duration, valid = MIDITranslator.translate(message)
-#             if valid:
-#                 playNote(freq, duration, target)
+    @staticmethod
+    def play(midi: MidiFile, controller: RobotController): 
+        for message in midi.play():
+            freq, duration, valid = MIDITranslator.translate(message)
+            if valid:
+                Player.play_note(freq, duration, controller)
 
-#     @staticmethod
-#     def playNote(frequency: float, duration: float):
-#         target = GameController.random_robot()
-#         playNote(frequency, duration, target)
+    @staticmethod
+    def play_note_random(frequency: float, duration: float):
+        controller = GameController().random(owned = True)
+        Player.play_note(frequency, duration, controller)
 
-#     @staticmethod
-#     def playNote(frequency: float, duration: float, target: Robot):
-#         pass
+    @staticmethod
+    def play_note(frequency: float, duration: float, controller: RobotController): 
+        duration += 100
+        frequency += 0
+
+        duration *= 1.0
+        frequency *= 1.0
+
+        controller.beep(int(frequency), int(duration))

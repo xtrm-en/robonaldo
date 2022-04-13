@@ -5,10 +5,11 @@ except Exception as e:
     print("Couldn't load rsk2:", e)
     sys.exit()
 
+from time import sleep
 from mido import MidiFile
 from robonaldo.music import MIDITranslator
 
-mid = MidiFile('tests/MILF.mid')
+mid = MidiFile('tests/midi/bad2.mid')
 
 with rsk.Client(host="172.19.39.223") as client:
     index = 0
@@ -17,11 +18,15 @@ with rsk.Client(host="172.19.39.223") as client:
         number = [2, 2][index % 2]
 
         freq, duration, valid = MIDITranslator.translate(msg)
+        print(msg)
+
         if not valid:
             continue
-        
+
         freq *= 1.5
+        duration += 100
         duration *= 1.0
+
         if duration == 0:
             continue
 

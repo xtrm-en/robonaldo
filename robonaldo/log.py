@@ -6,7 +6,7 @@ class LogLevel(Enum):
     WARN = 20
     ERROR = 30
     FATAL = 40
-    DEBUG = 0
+    TRACE = 0
 
     def __init__(self, priority: int):
         self.__priority = priority
@@ -28,7 +28,7 @@ class Logger:
 
         t = time.localtime()
         current_time = time.strftime("%H:%M:%S", t)
-        print("[" + current_time + "] [" + self.__name + "/" + level.name + "]", message)
+        print("[" + current_time + "] [" + self.__name + "/" + level.name + "]", str(message))
 
     def info(self, message: object) -> None:
         self.log(LogLevel.INFO, message)
@@ -43,4 +43,7 @@ class Logger:
         self.log(LogLevel.FATAL, message)
 
     def debug(self, message: object) -> None:
-        self.log(LogLevel.DEBUG, message)
+        self.log(LogLevel.TRACE, message)
+
+    def trace(self, message: object) -> None:
+        self.log(LogLevel.TRACE, message)

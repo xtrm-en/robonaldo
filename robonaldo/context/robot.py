@@ -1,12 +1,17 @@
 from enum import Enum
 from .entities import Rotatable
+from rsk import field_dimensions
+
 
 class Robot(Rotatable):
-    pass
+    def __init__(self):
+        pass
+
 
 class RobotOwnership(Enum):
     ALLY = 'ALLY'
     ENEMY = 'ENEMY'
+
 
 class RobotColor(Enum):
     GREEN = 'GREEN'
@@ -14,4 +19,3 @@ class RobotColor(Enum):
 
     def get_other(self):
         return self.BLUE if self == self.GREEN else self.GREEN
-        

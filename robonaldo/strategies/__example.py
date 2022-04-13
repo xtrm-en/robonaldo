@@ -1,10 +1,14 @@
+from robonaldo.context.game import GameContext
+from robonaldo.controller import RobotController
+from robonaldo.strategy import RobotStrategy
+
 class ExampleStrategy(RobotStrategy):
     # Definir le nom de la strategie (utile pour la communication inter-strat)
     def __init__(self):
         super().__init__("dancing")
 
     # Qu'est ce que les robots doivent faire durant cette strategie (en loccurence spin samer)
-    def update(self, ctx: GameContext, robot: Robot):
+    def update(self, ctx: GameContext, robot: RobotController):
         robot.spin()
 
     # Activer cette strategie si la balle se retrouve dans notre quart de terrain

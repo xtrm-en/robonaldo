@@ -12,7 +12,7 @@ from rsk import field_dimensions, utils
 import math
 
 key = ''
-target = ("green", 1)
+target = ("blue", 1)
 
 
 def update(client: rsk.Client, deltaTime: float):
