@@ -15,7 +15,7 @@ class FarTracked(RobotStrategy):
         super().__init__("def_far_track")
 
     def update(self, ctx: GameContext, controller: RobotController) -> None:
-        pass
+        controller.goto()
 
     def activate_on(self, ctx: GameContext) -> List[Robot]:
         closest = None
