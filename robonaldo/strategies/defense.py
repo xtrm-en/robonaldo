@@ -300,10 +300,12 @@ GOAL_THRESHOLD = -.8 / .9
 BACK_POS = -1.195
 
 
-class AttackStrategy(RobotStrategy):
+class DefenseStrategy(RobotStrategy):
     def update(self, ctx: GameContext, robot: Robot, controller: RobotController) -> None:
         if ctx.ball.x < GOAL_THRESHOLD:
-            contoller.goto_rel(BACK_POS, robot.y, 0, )
+            contoller.goto_rel(BACK_POS, robot.y, 0)
+
+StrategyManager().defense = DefenseStrategy()
 
 # team = 'green'
 # nbr = 1
