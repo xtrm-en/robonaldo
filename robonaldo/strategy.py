@@ -10,14 +10,38 @@ class RobotStrategy:
     def update(self, ctx: GameContext, robot: Robot, controller: RobotController) -> None:
         pass
 
+ctx = None
+
+
+def execute_attack(attack):
+    while True:
+        if ctx is not None:
+            attack.process(ctx)
+
+def execute_defense(defense):
+    while True:
+        if ctx is not None:
+            defense.process(ctx)
+
+
 class StrategyManager(metaclass = Singleton):
+    __target = "robonaldo/strategies"
     __reg = False
-    __robots = None
-    __ctrls = None
+
+    attack = None
+    defense = None
 
     def construct(self) -> None:
-        self.__attack = AttackStrategy()
-        self.__defense = DefenseStrategy()
+        sys.path.append(self.__target)
+        for file in os.listdir(self.__target):
+            if '.py' in file and '.pyc' not in file and '__' not in file:
+                name = file.replace('.py', '')
+                __import__(name)
+
+        self.attack_thread = threading.Thread(target=execute_attack, args=(attack,))
+        self.attack_thread.start()
+        self.defense_thread = threading.Thread(target=execute_defense, args=(defense,))
+        self.defense_thread.start()
 
     def register_on(self, updater: ContextUpdater) -> None:
         if self.__reg is not True:
@@ -26,11 +50,5 @@ class StrategyManager(metaclass = Singleton):
         else:
             raise Exception("Tried registering StrategyManager twice.")
 
-    def __update(self, ctx: GameContext, delta_time: float) -> None:
-        if self.__robots is None:
-            rbts = ctx.robots(ownership=RobotOwnership.ALLY)
-            self.__robots = [rbts[0], rbts[1]]
-            self.__ctrls = [RobotController.of(rbts[0]), RobotController.of(rbts[1])]
-
-        self.__attack.update(ctx, self.__robots[0], self.__ctrls[0])
-        self.__defense.update(ctx, self.__robots[1], self.__ctrls[1])
+    def __update(self, _ctx: GameContext, delta_time: float) -> None:
+        ctx = _ctx

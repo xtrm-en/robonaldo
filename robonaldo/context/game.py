@@ -2,7 +2,7 @@ from typing import List, Dict
 from .entities import Positionable, Updatable
 from math import pi
 from .robot import Robot, RobotColor, RobotOwnership
-from rsk import field_dimensions
+from rsk import Client, field_dimensions
 import time
 
 class Terrain(Positionable):
@@ -53,7 +53,7 @@ class GameContext(Updatable):
             else:
                 self.__enemy_robots.append(robot)
 
-    def update(self, client: rsk.Client) -> None:
+    def update(self, client: Client) -> None:
         super().update()
         self.terrain.update((0, 0))
         self.ball.update(client.ball)

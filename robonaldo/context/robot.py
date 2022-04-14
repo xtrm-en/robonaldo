@@ -1,7 +1,7 @@
 from enum import Enum
 from .entities import Rotatable
 from math import pi
-from rsk import field_dimensions
+from rsk import Client, field_dimensions
 
 
 class RobotOwnership(Enum):
@@ -24,7 +24,7 @@ class Robot(Rotatable):
         self.color = color
         self.index = index
 
-    def update(self, client: rsk.Client) -> None:
+    def update(self, client: Client) -> None:
         robot = client.robots[self.color.name][self.index]
         if robot is None or robot.position is None or robot.rotation is None: return
         super().update(robot.position, robot.rotation)
