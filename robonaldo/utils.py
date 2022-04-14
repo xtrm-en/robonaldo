@@ -44,7 +44,7 @@ class Vector:
     def y(self) -> float:
         return self.__y
 
-    def multiply(self, factor_x: float, factor_y: float = None) -> None:
+    def multiply(self, factor_x: float, factor_y: float = None) -> 'Vector':
         self.__x *= factor_x
         self.__y *= factor_x if factor_y is None else factor_y
 

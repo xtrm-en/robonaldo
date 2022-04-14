@@ -6,6 +6,7 @@ except:
 from robonaldo.log import Logger, LogLevel
 from robonaldo.network import NetworkHandler
 from .game import GameContext
+from .robot import Robot, RobotColor
 
 
 class ContextUpdater:
@@ -38,5 +39,7 @@ class ContextUpdater:
     def update_context(self, client: rsk.Client, deltaTime: float):
         if self.__ctx is None:
             self.__ctx = GameContext.empty()
+        self.__ctx.update(client)
+
         
         

@@ -1,71 +1,23 @@
-from enum import Enum
-import os
 from robonaldo.context.game import GameContext
-from robonaldo.context.updater import ContextUpdater
 from robonaldo.context.robot import Robot
+from robonaldo.context.updater import ContextUpdater
 from robonaldo.controller import RobotController
-from robonaldo.log import Logger, LogLevel
+from robonaldo.strategies.attack import AttackStrategy
+from robonaldo.strategies.defense import DefenseStrategy
 from robonaldo.utils import Singleton
-from typing import List
-import sys
-
 
 class RobotStrategy:
-    """Strategise UwU
-    """
-
-    def __init__(self, id: str):
-        self.__id = id
-
-    @property
-    def id(self) -> str:
-        return self.__id
-
-    def update(self, ctx: GameContext, controller: RobotController) -> None:
+    def update(self, ctx: GameContext, robot: Robot, controller: RobotController) -> None:
         pass
-
-    def activate_on(self, ctx: GameContext) -> List[Robot]:
-        return None
-
-    def should_override(self, ctx: GameContext, robot: Robot, strat_id: str) -> bool:
-        return False
-
 
 class StrategyManager(metaclass = Singleton):
     __reg = False
-    __target = 'robonaldo/strategies'
-    __logger = Logger("StrategyManager", priority = LogLevel.TRACE)
-    strategies = {}
-    enabled = []
+    __robots = None
+    __ctrls = None
 
-    def register_all(self) -> None:
-        sys.path.append(self.__target)
-        for file in os.listdir(self.__target):
-            if '.py' in file and '.pyc' not in file and '__' not in file:
-                name = file.replace('.py', '')
-                __import__(name)
-
-    def by_name(self, name: str) -> RobotStrategy:
-        return self.strategies.get(name)
-
-    def is_enabled(self, strategy: RobotStrategy) -> bool:
-        return strategy in self.enabled
-
-    def set_enabled(self, strategy: RobotStrategy, state: bool) -> None:
-        if state:
-            if strategy not in self.enabled:
-                self.enabled.append(strategy)
-            self.__logger.info("Enabled strategy \'" + strategy.id + "\'.")
-        else:
-            if strategy in self.enabled:
-                self.enabled.remove(strategy)
-            self.__logger.info("Disabled strategy \'" + strategy.id + "\'.")
-
-
-    def register(self, strategy: RobotStrategy, state: bool) -> None:
-        self.__logger.trace("Registering strategy \'" + strategy.id + "\'.")
-        self.strategies[strategy.id] = strategy
-        self.set_enabled(strategy, state)
+    def construct(self) -> None:
+        self.__attack = AttackStrategy()
+        self.__defense = DefenseStrategy()
 
     def register_on(self, updater: ContextUpdater) -> None:
         if self.__reg is not True:
@@ -74,5 +26,11 @@ class StrategyManager(metaclass = Singleton):
         else:
             raise Exception("Tried registering StrategyManager twice.")
 
-    def __update(self, context: GameContext, delta_time: float) -> None:
-        pass
+    def __update(self, ctx: GameContext, delta_time: float) -> None:
+        if self.__robots is None:
+            rbts = ctx.robots(ownership=RobotOwnership.ALLY)
+            self.__robots = [rbts[0], rbts[1]]
+            self.__ctrls = [RobotController.of(rbts[0]), RobotController.of(rbts[1])]
+
+        self.__attack.update(ctx, self.__robots[0], self.__ctrls[0])
+        self.__defense.update(ctx, self.__robots[1], self.__ctrls[1])

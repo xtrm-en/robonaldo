@@ -17,7 +17,17 @@ class Positionable(Updatable):
         super().__init__(last_update)
         self.position = position
 
+    @property
+    def x(self) -> float:
+        return self.position[0]
+
+    @property
+    def y(self) -> float:
+        return self.position[1]
+
     def update(self, position: (float, float)) -> None:
+        if position is None:
+            return
         super().update()
         self.position = position
 
@@ -28,5 +38,7 @@ class Rotatable(Positionable):
         self.rotation = rotation
     
     def update(self, position: (float, float), rotation: float) -> None:
+        if position is None or rotation is None:
+            return
         super().update(position)
         self.rotation = rotation

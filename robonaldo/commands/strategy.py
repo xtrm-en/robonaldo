@@ -29,10 +29,10 @@ class Strategy(Command):
                 return (False, "Unknown strategy '" + strat_id + "'")
 
             if ctx.args[0] == "enable":
-                pass
+                return (False, "NotImplemented")
 
             if ctx.args[0] == "disable":
-                pass
+                return (False, "NotImplemented")
 
             return (False, "Invalid argument '" + ctx.args[0] + "'")
 

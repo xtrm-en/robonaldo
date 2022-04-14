@@ -28,8 +28,8 @@ class Robonaldo(metaclass = Singleton):
         self.__logger.info("Initializing GameController with NetworkHandler...")
         GameController().set_network(self.network_handler)
 
-        self.__logger.info("Setting up StrategyManager...")
-        StrategyManager().register_all()
+        # self.__logger.info("Setting up StrategyManager...")
+        # StrategyManager().construct()
  
     def connect(self, host: str, key: str) -> None:
         self.__logger.info("Initializing connection to the server...")

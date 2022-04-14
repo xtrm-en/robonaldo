@@ -4,33 +4,33 @@ from robonaldo.controller import RobotController
 from robonaldo.strategy import RobotStrategy, StrategyManager
 from typing import List
 
-DEFENSE_LINES = 0.2
+DEEP_THRESHOLD = -.8 / .9 # -.88888
 
 
-class FarTracked(RobotStrategy):
-    """Strategise UwU
-    """
+class CloseDeep(RobotStrategy):
 
     def __init__(self):
-        super().__init__("def_far_track")
+        super().__init__("def_close_deep")
 
-    def update(self, ctx: GameContext, controller: RobotController) -> None:
-        controller.goto()
+    def update(self, robot: Robot, ctx: GameContext, controller: RobotController) -> None:
+        controller.goto(ctx.terrain.rel_x(-1), ctx.terrain.rel_y(ctx.ball.y), ctx.terrain.rot(0))
 
     def activate_on(self, ctx: GameContext) -> List[Robot]:
+        # only activate if the ball is *deep* 
+        if ctx.ball.x > DEEP_THRESHOLD:
+            return []
+
         closest = None
         for robot in ctx.robots(side = RobotOwnership.ALLY):
             if closest is None:
                 closest = robot
             else:
-                if robot.get_relative_position() < closest.get_relative_position():
+                if robot.x < closest.x:
                     closest = robot
 
         return [closest] if closest is not None else []
 
-    def should_override(self, ctx: GameContext, robot: Robot, strat_id: str) -> bool:
-        '''Don't override anything as this is the least useful strategy
-        '''
-        return False
+    def override(self, robot: Robot, ctx: GameContext) -> List[str]:
+        return ['def_far_tracked']
 
 StrategyManager().register(FarTracked(), True)
