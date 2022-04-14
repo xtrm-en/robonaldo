@@ -116,102 +116,79 @@ class Predict:
                             return True
 '''----------------------------------------CHANGEMENT DE CLASSE WOUHOU--------------------------------------------------------'''
 class Defense:
-    def __init__(self, client, team, nbr: int):
-        self.defenseur = client.robots[team][nbr]
-        self.client = client
-        self.team = team
-        self.nbr = nbr
+    def __init__(self, predict: Predict, ctx: GameContext, robot: Robot, controller: RobotController):
+        self.predict = predict
+        self.ctx = ctx
+        self.robot = robot
+        self.controller = controller
 
     def reset_placement(self):
         '''Replace le goal à sa place de défaut'''
         if self.team == 'green':
-            self.defenseur.goto((-0.9, 0, 0))
+            self.controller.goto(-0.9, 0, 0)
         else:
-            self.defenseur.goto((0.9, 0, pi))
-
-    def move(self, x, y, z):
-        if self.team == "green":
-            self.defenseur.goto((x, y, z), False)
-
-    def angle_balle(self):
-        pass
-
-    def kick(self):
-        self.defenseur.kick(1)
-
+            self.controller.goto(0.9, 0, pi)
 
     def in_zone(self):
-        client = self.client
         if self.team == 'blue':
-            if client.ball[0] > 0 and client.ball[1] > -0.6 and client.ball[1] < 0.6:
-                return True
-            else:
-                return False
+            return self.ctx.ball.x > 0 and self.ctx.ball.y > -0.6 and self.ctx.ball.y < 0.6
         else:
-            if client.ball[0] < -0 and client.ball[1] > -0.6 and client.ball[1] < 0.6:
-                return True
-            else:
-                return False
+            return self.ctx.ball.x < -0 and self.ctx.ball.y > -0.6 and self.ctx.ball.y < 0.6
 
     def next_to_goal(self):
-        client = self.client
-        if abs(client.ball[0]) > 0.75 and abs(client.ball[1]) < 0.6:
-            return True
+        return abs(self.ctx.ball.x) > 0.75 and abs(self.ctx.ball.y) < 0.6
 
     def proche_de(self):
-        client = self.client
-        return abs(client.ball[0]-self.defenseur.position[0]) < 0.4
+        return abs(self.ctx.ball.x - self.robot.x) < 0.4
 
     def face_a(self):
-        client = self.client
-        return abs(abs(client.ball[1])-abs(self.defenseur.position[1])) < 0.05
-
-    def control(self, x, y, z):
-        self.defenseur.control(x, y, z)
+        return abs(abs(self.ctx.ball.y) - abs(self.robot.y)) < 0.05
 
     def degagement(self):
-        defe.reset_angle()
+        self.reset_angle()
+
         time.sleep(0.2)
-        if self.team=='green':
-            self.defenseur.goto((client.ball[0]-0.10,client.ball[1],0),True)
+
+        if self.team == 'green':
+            self.controller.goto(self.ctx.ball.x - 0.10, self.ctx.ball.y, 0, True)
         else:
-            self.defenseur.goto((client.ball[0]+0.10,client.ball[1],pi),True)
-        self.defenseur.control(0.25,0,0)
+            self.controller.goto(self.ctx.ball.x + 0.10, self.ctx.ball.y, 0, True)
+
+        self.controller.control(0.25, 0, 0)
         time.sleep(0.5)
-        self.defenseur.kick()
+        self.controller.kick()
 
     def reset_angle(self):
         if self.team == 'green':
-            self.defenseur.goto(
-                (self.defenseur.position[0], self.defenseur.position[1], 0), False)
+            self.controller.goto(self.robot.x, self.robot.y, 0, False)
         else:
-            self.defenseur.goto(
-                (self.defenseur.position[0], self.defenseur.position[1], pi), False)
+            self.controller.goto(self.robot.x, self.robot.y, pi, False)
 
     def deplace_cage(self):
-        client = self.client
         if self.team == 'green':
-            while client.ball[1]-self.defenseur.position[1] > 0.05 and abs(client.ball[1]) > 0.4:
-                self.defenseur.control(0, 0.4, 0)
-            while client.ball[1]-self.defenseur.position[1] < -0.05 and abs(client.ball[1]) > 0.4:
-                self.defenseur.control(0, -0.4, 0)
-            if abs(client.ball[1]) > 0.4:
-                self.defenseur.control(0,0,0)
+            while self.ctx.ball.y - self.robot.y > 0.05 and abs(self.ctx.ball.y) > 0.4:
+                self.controller.control(0, 0.4, 0)
+            while self.ctx.ball.y - self.robot.y < -0.05 and abs(self.ctx.ball.y) > 0.4:
+                self.controller.control(0, -0.4, 0)
+            if abs(self.ctx.ball.y) > 0.4:
+                self.controller.control(0, 0, 0)
         else:
-            while client.ball[1]-self.defenseur.position[1] > 0.05:
-                self.defenseur.control(0, -0.4, 0)
-            while client.ball[1]-self.defenseur.position[1] < -0.05:
-                self.defenseur.control(0, 0.4, 0)
+            while self.ctx.ball.y - self.robot.y > 0.05:
+                self.controller.control(0, -0.4, 0)
+            while self.ctx.ball.y - self.robot.y < -0.05:
+                self.controller.control(0, 0.4, 0)
 
     def avance(self):
-        self.defenseur.control(0.4, 0, 0)
+        self.controller.control(0.4, 0, 0)
 
     def deplace_cage_avance(self):
         self.reset_angle()
 
-        prolongation = predict.prolongation_seg()
+        prolongation = self.predict.prolongation_seg()
         if prolongation == None:    
             return
+
+        # STOPPED HERE
 
         if self.team == 'green':
             while True:
@@ -301,54 +278,89 @@ BACK_POS = -1.195
 
 
 class DefenseStrategy(RobotStrategy):
-    def update(self, ctx: GameContext, robot: Robot, controller: RobotController) -> None:
-        if ctx.ball.x < GOAL_THRESHOLD:
-            contoller.goto_rel(BACK_POS, robot.y, 0)
+    # def update(self, ctx: GameContext, robot: Robot, controller: RobotController) -> None:
+    #     if ctx.ball.x < GOAL_THRESHOLD:
+    #         contoller.goto_rel(BACK_POS, robot.y, 0)
+    def __init__(self):
+        self.defe = Defense(robot)
+        self.predict = Predict(robot)
+
+    def update(self, ctx: GameContext, robot: Robot, ctrl: RobotController):
+        defe.reset_angle()
+        defe.reset_placement()
+        while True:
+            try:
+                if display:
+                    predict.print_info()
+
+                if defe.threshold_cage():
+
+                    defe.retreat()
+                    defe.deplace_cage()
+
+                    while defe.face_a():
+                        defe.deplace_cage()
+                        defe.reset_axe_avance()
+                        time.sleep(0.7)
+                        defe.degagement()
+
+                if predict.prolongation_seg() == None or abs(predict.prolongation_seg()) > 0.4 or defe.next_to_goal() or venere:
+                    defe.reset_axe_avance()
+                    defe.deplace_cage()
+                    defe.reset_angle()
+
+                    if defe.proche_de() and defe.face_a() or predict.plus_proche() == (defe.team,defe.nbr) and defe.face_a() or venere:
+                        defe.deplace_cage()
+                        defe.reset_angle()
+                        time.sleep(0.2)
+                        defe.degagement()
+                        defe.reset_placement()
+                else:
+                    defe.deplace_cage_avance()
+                    defe.reset_axe_avance()
+                    defe.reset_angle()
+            except:
+                defe.control(0,0,0)
 
 StrategyManager().defense = DefenseStrategy()
 
-# team = 'green'
-# nbr = 1
-# display = True
-# venere = False
-
 # with rsk.Client(host='172.19.39.223', key='') as client:
-#     defe = Defense(client, team, nbr)
-#     predict = Predict(client, team)
-#     defe.reset_angle()
-#     defe.reset_placement()
-#     while True:
-#         try:
-#             if str(client.ball) == "None":
-#                 continue
-#             if display:
-#                 predict.print_info()
+    # defe = Defense(client, team, nbr)
+    # predict = Predict(client, team)
+    # defe.reset_angle()
+    # defe.reset_placement()
+    # while True:
+    #     try:
+    #         if str(client.ball) == "None":
+    #             continue
+    #         if display:
+    #             predict.print_info()
 
-#             if defe.threshold_cage():
+    #         if defe.threshold_cage():
 
-#                 defe.retreat()
-#                 defe.deplace_cage()
+    #             defe.retreat()
+    #             defe.deplace_cage()
 
-#                 while defe.face_a():
-#                     defe.deplace_cage()
-#                     defe.reset_axe_avance()
-#                     time.sleep(0.7)
-#                     defe.degagement()
+    #             while defe.face_a():
+    #                 defe.deplace_cage()
+    #                 defe.reset_axe_avance()
+    #                 time.sleep(0.7)
+    #                 defe.degagement()
 
-#             if predict.prolongation_seg() == None or abs(predict.prolongation_seg()) > 0.4 or defe.next_to_goal() or venere:
-#                 defe.reset_axe_avance()
-#                 defe.deplace_cage()
-#                 defe.reset_angle()
+    #         if predict.prolongation_seg() == None or abs(predict.prolongation_seg()) > 0.4 or defe.next_to_goal() or venere:
+    #             defe.reset_axe_avance()
+    #             defe.deplace_cage()
+    #             defe.reset_angle()
 
-#                 if defe.proche_de() and defe.face_a() or predict.plus_proche() == (defe.team,defe.nbr) and defe.face_a() or venere:
-#                     defe.deplace_cage()
-#                     defe.reset_angle()
-#                     time.sleep(0.2)
-#                     defe.degagement()
-#                     defe.reset_placement()
-#             else:
-#                 defe.deplace_cage_avance()
-#                 defe.reset_axe_avance()
-#                 defe.reset_angle()
-#         except:
-#             defe.control(0,0,0)
+    #             if defe.proche_de() and defe.face_a() or predict.plus_proche() == (defe.team,defe.nbr) and defe.face_a() or venere:
+    #                 defe.deplace_cage()
+    #                 defe.reset_angle()
+    #                 time.sleep(0.2)
+    #                 defe.degagement()
+    #                 defe.reset_placement()
+    #         else:
+    #             defe.deplace_cage_avance()
+    #             defe.reset_axe_avance()
+    #             defe.reset_angle()
+    #     except:
+    #         defe.control(0,0,0)

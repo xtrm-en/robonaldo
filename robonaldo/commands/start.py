@@ -7,8 +7,8 @@ from typing import List
 
 class Start(Command):
     def execute(self, ctx: CommandContext) -> bool:
-        if len(ctx.args) == 1:
-            Robonaldo().initialize(RobotColor[ctx.args[0].upper()])
+        if len(ctx.args) == 2:
+            Robonaldo().initialize(RobotColor[ctx.args[0].upper()], int(ctx.args[1]))
             return (True, "")
 
         return (False, "Invalid command arguments")
@@ -17,7 +17,7 @@ class Start(Command):
         return "Starts the match."
 
     def usages(self) -> List[str]:
-        return ["%NAME% <blue/green>"]
+        return ["%NAME% <blue/green> <1/-1>"]
 
     def aliases(self) -> List[str]:
         return ["go"]

@@ -65,6 +65,9 @@ class RobotController: # pylint: disable=function-redefined
     def robot_color(self) -> RobotColor:
         return self.__robot_color
 
+    def kick(self, power: float = 1.) -> bool:
+        return self.command('kick', power)
+
     def goto(self, x: float, y: float, orientation: float, wait=True, wait_delay: float = 0.05) -> bool:
         if wait:
             while not self.goto(x, y, orientation, wait=False):

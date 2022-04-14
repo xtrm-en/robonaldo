@@ -12,22 +12,19 @@ class Terrain(Positionable):
         self.height = height
         self.side_multiplier = side_multiplier
 
-    # def rel_x(value: float) -> float:
-    #     return value * self.width * self.side_multiplier
+    def rel_x(value: float) -> float:
+        return value * self.width * self.side_multiplier
 
-    # def rel_y(value: float) -> float:
-    #     return value * self.height
+    def rel_y(value: float) -> float:
+        return value * self.height
 
-    # def rel_rot(value: float) -> float:
-    #     return value * (1 if self.side_multiplier == 1 else pi)
+    def rel_rot(value: float) -> float:
+        return value * (1 if self.side_multiplier == 1 else pi)
 
 
 class Ball(Positionable):
     def __init__(self, position: (float, float)):
         super().__init__(position)
-
-    def update(self, position: (float, float)) -> None:
-        super().update(position)
 
 
 ROBOT_REMOVE_TIMEOUT = 5 * 1000

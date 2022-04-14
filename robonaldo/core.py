@@ -38,10 +38,12 @@ class Robonaldo(metaclass = Singleton):
 
         self.__connected = True
 
-    def initialize(self, team_color: RobotColor) -> None:
+    def initialize(self, team_color: RobotColor, side: int = 1) -> None:
         if self.__connected is not True:
             self.__logger.error("Robonaldo client not connected to a server!")
             return
+
+        self.side = side
 
         if self.__initialized is True:
             return
