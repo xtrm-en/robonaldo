@@ -2,8 +2,6 @@ from robonaldo.context.game import GameContext
 from robonaldo.context.robot import Robot
 from robonaldo.context.updater import ContextUpdater
 from robonaldo.controller import RobotController
-from robonaldo.strategies.attack import AttackStrategy
-from robonaldo.strategies.defense import DefenseStrategy
 from robonaldo.utils import Singleton
 
 class RobotStrategy:
@@ -29,7 +27,9 @@ class StrategyManager(metaclass = Singleton):
     __reg = False
 
     attack = None
+    attack_thread = None
     defense = None
+    defense_thread = None
 
     def construct(self) -> None:
         sys.path.append(self.__target)

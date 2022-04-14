@@ -73,6 +73,11 @@ class Robonaldo(metaclass = Singleton):
 
         self.network_handler.close()
 
+        if StrategyManager().attack_thread is not None:
+            StrategyManager().attack_thread.stop()
+        if StrategyManager().defense_thread is not None:
+            StrategyManager().defense_thread.stop()
+
 
 Robonaldo().construct()
 
