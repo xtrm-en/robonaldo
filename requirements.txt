@@ -1,0 +1,21 @@
+# Robot Control Kit
+robot-soccer-kit
+
+# Web UI
+flask
+flask-cors
+waitress
+
+# Config
+appdirs
+toml
+
+# Class declaration 
+attrs
+
+# Midi Handling
+#mido
+#python-rtmidi
+
+# Formatter
+black

@@ -1,0 +1,13 @@
+body {
+    background-color: #000;
+}
+
+.button {
+    color: #fff;
+    text-decoration: none;
+}
+
+.button:hover {
+    text-decoration: underline;
+    color: #fcdeed;
+}
