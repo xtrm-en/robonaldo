@@ -1,5 +1,0 @@
-DEFENSIVE
----
-low_ball
-far_track
-threatened
